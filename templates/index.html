@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aadhaar Verification System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .upload-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+            transition: transform 0.3s ease;
+        }
+
+        .upload-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .upload-area {
+            border: 3px dashed #667eea;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 60px 40px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .upload-area:hover {
+            border-color: #764ba2;
+            background: linear-gradient(135deg, #e0e7ff 0%, #cfd9df 100%);
+        }
+
+        .upload-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .upload-text {
+            font-size: 1.2rem;
+            color: #4a5568;
+            font-weight: 600;
+        }
+
+        .upload-hint {
+            font-size: 0.9rem;
+            color: #718096;
+            margin-top: 10px;
+        }
+
+        #preview {
+            margin-top: 30px;
+            max-width: 100%;
+            display: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: zoomIn 0.5s ease;
+        }
+
+        .btn-upload {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 50px;
+            margin-top: 25px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s ease;
+            display: none;
+        }
+
+        .btn-upload:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
+        }
+
+        .btn-upload:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .loading {
+            display: none;
+            margin-top: 20px;
+            color: #667eea;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(102, 126, 234, 0.3);
+            border-radius: 50%;
+            border-top-color: #667eea;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        .result-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .validation-status {
+            text-align: center;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            animation: bounceIn 0.6s ease;
+        }
+
+        .status-valid {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+        }
+
+        .status-invalid {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            box-shadow: 0 10px 30px rgba(239, 68, 68, 0.3);
+        }
+
+        .status-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .status-message {
+            font-size: 0.9rem;
+            opacity: 0.95;
+            margin-top: 8px;
+            font-weight: 400;
+        }
+
+        .section-title {
+            font-size: 1.4rem;
+            color: #2d3748;
+            margin-bottom: 20px;
+            font-weight: 700;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+            display: inline-block;
+        }
+
+        .details-grid {
+            display: grid;
+            gap: 20px;
+            margin-top: 25px;
+        }
+
+        .detail-item {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            border-left: 4px solid #667eea;
+        }
+
+        .detail-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .detail-label {
+            font-weight: 700;
+            color: #4a5568;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .detail-value {
+            font-size: 1.1rem;
+            color: #2d3748;
+            font-weight: 500;
+        }
+
+        .annotated-section {
+            margin-top: 40px;
+        }
+
+        #annotated {
+            width: 100%;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-top: 20px;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes zoomIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes bounceIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.3);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.05);
+            }
+            70% {
+                transform: scale(0.9);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .upload-card, .result-card {
+                padding: 25px;
+            }
+            
+            .upload-area {
+                padding: 40px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔐 Aadhaar Verification System</h1>
+        <p>Secure & Instant Identity Verification</p>
+    </div>
+
+    <div class="container">
+        <div class="upload-card">
+            <div class="upload-area" onclick="document.getElementById('file').click()">
+                <div class="upload-icon">📤</div>
+                <div class="upload-text">Click to Upload Aadhaar Card</div>
+                <div class="upload-hint">Supports JPG, PNG formats</div>
+                <input type="file" id="file" accept="image/*" style="display:none" onchange="previewFile()">
+            </div>
+            <img id="preview" src="#" alt="Preview">
+            <center>
+                <button class="btn-upload" id="uploadBtn" onclick="upload(event)">
+                    🚀 Upload & Verify
+                </button>
+                <div class="loading" id="loading">
+                    <span class="spinner"></span>
+                    Processing your document...
+                </div>
+            </center>
+        </div>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+        function previewFile() {
+            const file = document.getElementById('file').files[0];
+            const preview = document.getElementById('preview');
+            const uploadBtn = document.getElementById('uploadBtn');
+            
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                    uploadBtn.style.display = 'inline-block';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        async function upload(event) {
+            event.stopPropagation();
+            
+            const fileInput = document.getElementById('file');
+            const uploadBtn = document.getElementById('uploadBtn');
+            const loading = document.getElementById('loading');
+            const resultDiv = document.getElementById('result');
+            
+            if (!fileInput.files[0]) {
+                alert("Please choose a file!");
+                return;
+            }
+            
+            uploadBtn.disabled = true;
+            uploadBtn.style.display = 'none';
+            loading.style.display = 'block';
+            resultDiv.innerHTML = '';
+            
+            const formData = new FormData();
+            formData.append("file", fileInput.files[0]);
+
+            try {
+                const res = await fetch("/api/upload", { 
+                    method: "POST", 
+                    body: formData 
+                });
+                
+                const data = await res.json();
+
+                if (data.error) {
+                    resultDiv.innerHTML = `
+                        <div class="result-card">
+                            <div class="validation-status status-invalid">
+                                <span class="status-icon">❌</span>
+                                <div>Error: ${data.error}</div>
+                            </div>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const details = data.details;
+                const isValid = data.verhoeff_valid;
+                
+                let html = '<div class="result-card">';
+                
+                // Validation Status
+                if (details.aadhaar_number) {
+                    if (isValid) {
+                        html += `
+                            <div class="validation-status status-valid">
+                                <span class="status-icon">✅</span>
+                                <div>Valid Aadhaar Number</div>
+                                <div class="status-message">Aadhaar number passed Verhoeff checksum validation</div>
+                            </div>
+                        `;
+                    } else {
+                        html += `
+                            <div class="validation-status status-invalid">
+                                <span class="status-icon">⚠️</span>
+                                <div>Invalid Aadhaar Number</div>
+                                <div class="status-message">Aadhaar number failed Verhoeff checksum validation</div>
+                            </div>
+                        `;
+                    }
+                }
+                
+                // Extracted Details
+                html += '<div class="section-title">📋 Extracted Details</div>';
+                html += '<div class="details-grid">';
+                
+                html += `
+                    <div class="detail-item">
+                        <span class="detail-label">👤 Full Name</span>
+                        <span class="detail-value">${details.name || 'Not Detected'}</span>
+                    </div>
+                `;
+                
+                html += `
+                    <div class="detail-item">
+                        <span class="detail-label">🎂 Date of Birth</span>
+                        <span class="detail-value">${details.dob || 'Not Detected'}</span>
+                    </div>
+                `;
+                
+                html += `
+                    <div class="detail-item">
+                        <span class="detail-label">⚧️ Gender</span>
+                        <span class="detail-value">${details.gender || 'Not Detected'}</span>
+                    </div>
+                `;
+                
+                html += `
+                    <div class="detail-item">
+                        <span class="detail-label">🆔 Aadhaar Number</span>
+                        <span class="detail-value">${details.aadhaar_number || 'Not Detected'}</span>
+                    </div>
+                `;
+                
+                html += `
+                    <div class="detail-item">
+                        <span class="detail-label">📍 Address</span>
+                        <span class="detail-value">${details.address || 'Not Detected'}</span>
+                    </div>
+                `;
+                
+                html += '</div>';
+                
+                // Annotated Image
+                if (data.annotated_image) {
+                    html += '<div class="annotated-section">';
+                    html += '<div class="section-title">🎯 Detected Fields</div>';
+                    html += `<img id="annotated" src="/${data.annotated_image}?t=${Date.now()}" alt="Annotated">`;
+                    html += '</div>';
+                }
+                
+                html += '</div>';
+                resultDiv.innerHTML = html;
+                
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="result-card">
+                        <div class="validation-status status-invalid">
+                            <span class="status-icon">❌</span>
+                            <div>Error: ${error.message}</div>
+                        </div>
+                    </div>
+                `;
+            } finally {
+                uploadBtn.disabled = false;
+                uploadBtn.style.display = 'inline-block';
+                loading.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
