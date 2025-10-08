@@ -1,0 +1,29 @@
+{
+  "image": "e69a0e54-eb2f-4c10-b0ee-d47616e3232b_1.png",
+  "fields": [
+    {
+      "label": "ADDRESS",
+      "ocr_text": "Address: Jai Prakash, D1/73B, Mansa Ram\nPark, uttam nagar, D.K.Mohan Garden, West\nDelhi, Delhi, 110059"
+    },
+    {
+      "label": "AADHAR_NUMBER",
+      "ocr_text": "7060 8003 0890"
+    },
+    {
+      "label": "AADHAR_NUMBER",
+      "ocr_text": "7060 8003\n0890"
+    },
+    {
+      "label": "DATE_OF_BIRTH",
+      "ocr_text": "13/11/1996"
+    },
+    {
+      "label": "NAME",
+      "ocr_text": "Pawan"
+    },
+    {
+      "label": "GENDER",
+      "ocr_text": "Male"
+    }
+  ]
+}
